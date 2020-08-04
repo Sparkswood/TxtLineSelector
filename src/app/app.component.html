@@ -8,12 +8,12 @@
   </div>
   
     <button mat-raised-button *ngFor="let button of buttons" [color]="button.color" (click)="setActiveColor(button.number)">{{button.number}}</button>
-    <button mat-raised-button *ngIf="buttons.length < 9" (click)="addColor()">+</button>
+    <button mat-raised-button *ngIf="buttons.length < 10" (click)="addColor()">+</button>
     <button mat-raised-button color="primary" (click)="getResult()">Result</button>
 </div>
 
 <div id="file" class="file">
-  <div class="values default-value-color" *ngFor="let value of values" id="{{value.id}}" (click)="markValue($event, false)">
+  <div class="values default-value-color" *ngFor="let value of values" id="{{value.id}}" (mousedown)="startMouseHold(value.id)" (mouseleave)="onDragMouse(value.id)" (mouseup)="endMouseHold(value.id)">
     {{value.value}}
   </div>
 </div>

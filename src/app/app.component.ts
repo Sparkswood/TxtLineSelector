@@ -13,15 +13,14 @@ export class AppComponent {
   @ViewChild('fileDownload') fileDownload;
 
   @HostListener('window:keydown', ['$event']) onkeypress(event: KeyboardEvent) {
-    event.preventDefault();
-    console.log(event.key);
-    if (event.key === '1' || event.key === '2' || event.key === '3' || event.key === '4' ||  event.key === '5' || event.key === '6' || event.key === '7' || event.key === '8' || event.key === '9') {
-      if (parseInt(event.key) <= this.buttons.length) {
+    if (event.key === '1' || event.key === '2' || event.key === '3' || event.key === '4' ||  event.key === '5' || event.key === '6' || event.key === '7' || event.key === '8' || event.key === '9' || event.key === '0') {
+      if (parseInt(event.key) < this.buttons.length) {
         this.setActiveColor(event.key);
       }
     }
 
     if ((event.key === 'ArrowUp' || event.key === 'w' || event.key === 'W') && this.activeRow - 1 > 0) {
+      event.preventDefault();
       if (event.shiftKey) {
         this.markValue(null, true);
       }
@@ -29,7 +28,7 @@ export class AppComponent {
     }
 
     if ((event.key === 'ArrowDown' || event.key === 's' || event.key === 'S') && this.activeRow + 1 <= this.values.length) {
-      console.log(event.shiftKey);
+      event.preventDefault();
       if (event.shiftKey) {
         this.markValue(null, true);
       }
@@ -39,7 +38,7 @@ export class AppComponent {
       event.preventDefault();
       this.markValue(null, true);
     }
-    if ((event.key === '+' || event.key === '=') && this.buttons.length < 9) {
+    if ((event.key === '+' || event.key === '=') && this.buttons.length < 10) {
       this.addColor();
     }
   }
@@ -50,9 +49,15 @@ export class AppComponent {
   activeRow = 1;
   activeColor: number = 0;
 
+  mouseHold: boolean = false;
+
   resultJSON = [];
 
   buttons = [
+    {
+      number: 0,
+      color: ''
+    },
     {
       number: 1,
       color: 'grey'
@@ -67,15 +72,14 @@ export class AppComponent {
     },
     
   ]
-  colorClasses = ['grey', 'red', 'orange', 'yellow', 'green', 'blue', 'granat', 'violet', 'pink'];
+  colorClasses = ['', 'grey', 'red', 'orange', 'yellow', 'green', 'blue', 'granat', 'violet', 'pink'];
 
   constructor(
     private _httpClient: HttpClient
   ) { }
   
   addColor() {
-    this.buttons.push({ number: this.buttons.length + 1, color: this.colorClasses[this.buttons.length] })
-    console.log(this.buttons);
+    this.buttons.push({ number: this.buttons.length, color: this.colorClasses[this.buttons.length] })
   }
 
   onClickFileInputButton(): void {
@@ -105,13 +109,12 @@ export class AppComponent {
       id = id + 1;
     });
     setTimeout(() => {
-      console.log(this.resultJSON);
       document.getElementById('1').classList.add('selected-row');
     }, 200);
   }
 
   setActiveColor(colorNumber) {
-    this.activeColor = parseInt(colorNumber) - 1;
+    this.activeColor = parseInt(colorNumber);
   }
 
   onUp() {
@@ -143,23 +146,21 @@ export class AppComponent {
       if (this.activeColor === i) colorClass = `mat-${this.colorClasses[i]}`;
     }
 
-    if (document.getElementById(id).classList.contains(colorClass)) {
-      this.resultJSON[id - 1] = 0;
-      document.getElementById(id).classList.remove(colorClass);
-    } else {
+    // if (document.getElementById(id).classList.contains(colorClass)) {
+    //   this.resultJSON[id - 1] = 0;
+    //   document.getElementById(id).classList.remove(colorClass);
+    // } else {
       this.colorClasses.forEach(color => {
         document.getElementById(id).classList.remove(`mat-${color}`);
       });
       this.resultJSON[id - 1] = this.activeColor + 1;
       document.getElementById(id).classList.add(colorClass);
-    }
+    // }
   }
 
   getResult() {
     const filename = `file-${new Date().toLocaleTimeString()}.json`;
     let arrayToString = JSON.stringify(Object.assign({}, this.resultJSON));  // convert array to string
-    console.log(arrayToString);
-    arrayToString.replace('/"/g', '');
     const blob = new Blob([arrayToString], { type: '.json' });
     saveAs(blob, filename);
   }
@@ -170,8 +171,27 @@ export class AppComponent {
     })
   }
 
-  onDrag(event) {
-    console.log(event);
+  startMouseHold(id) {
+    document.getElementById(this.activeRow.toString()).classList.remove('selected-row');
+    this.mouseHold = true;
+    this.activeRow = id;
+    document.getElementById(this.activeRow.toString()).classList.add('selected-row');
+  }
+
+  endMouseHold(id) {
+    document.getElementById(this.activeRow.toString()).classList.remove('selected-row');
+    this.onDragMouse(id);
+    this.mouseHold = false;
+    document.getElementById(this.activeRow.toString()).classList.add('selected-row');
+  }
+
+  onDragMouse(id) {
+    if (this.mouseHold) {
+      document.getElementById(this.activeRow.toString()).classList.remove('selected-row');
+      this.activeRow = id;
+      this.markValue(null, true);
+      document.getElementById(this.activeRow.toString()).classList.add('selected-row');
+    }
   }
 
 }

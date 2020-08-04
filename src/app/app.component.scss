@@ -1,0 +1,53 @@
+.values {
+    white-space: pre;
+    padding: 2px;
+}
+
+.default-value-color:nth-child(odd) {
+    background: rgb(245, 245, 245);
+}
+
+.default-value-color:nth-child(even) {
+    background: white;
+}
+
+.file {
+    margin-left: 100px;
+}
+
+.menu {
+    width: 100px;
+    position: fixed;
+    display: inline-grid;
+    top: 0;
+    background: white;
+}
+
+.mat-green {
+    background-color: rgb(96, 166, 66) !important;
+    color: #fff;
+}
+
+.mat-yellow {
+    background-color: rgb(222, 193, 51) !important;
+    color: #fff;
+}
+
+.mat-blue {
+    background-color: rgb(90, 148, 166) !important;
+    color: #fff;
+}
+
+.mat-red {
+    background-color: rgb(168, 62, 73) !important;
+    color: #fff;
+}
+
+.selected-row {
+    border: 2px solid black;
+}
+
+button {
+    width: 80px;
+    margin: 5px 10px;
+}

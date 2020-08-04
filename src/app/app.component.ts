@@ -1,4 +1,7 @@
 import { HostListener, Component, ViewChild } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { saveAs } from 'file-saver';
 
 @Component({
   selector: 'app-root',
@@ -7,12 +10,15 @@ import { HostListener, Component, ViewChild } from '@angular/core';
 })
 export class AppComponent {
   @ViewChild('fileInput') fileInput;
+  @ViewChild('fileDownload') fileDownload;
 
   @HostListener('window:keydown', ['$event']) onkeypress(event: KeyboardEvent) {
     event.preventDefault();
     console.log(event.key);
-    if (event.key === '1' || event.key === '2' || event.key === '3' || event.key === '4') {
-      this.setActiveColor(event.key);
+    if (event.key === '1' || event.key === '2' || event.key === '3' || event.key === '4' ||  event.key === '5' || event.key === '6' || event.key === '7' || event.key === '8' || event.key === '9') {
+      if (parseInt(event.key) <= this.buttons.length) {
+        this.setActiveColor(event.key);
+      }
     }
 
     if ((event.key === 'ArrowUp' || event.key === 'w') && this.activeRow - 1 > 0) {
@@ -33,6 +39,36 @@ export class AppComponent {
 
   activeRow = 1;
   activeColor: number = 0;
+
+  resultJSON = [];
+  fileUrl;
+  fileNameToDownload = 'file.txt';
+
+  buttons = [
+    {
+      number: 1,
+      color: 'grey'
+    },
+    {
+      number: 2,
+      color: 'red'
+    },
+    {
+      number: 3,
+      color: 'orange'
+    },
+    
+  ]
+  colorClasses = ['grey', 'red', 'orange','yellow', 'green','blue', 'granat', 'violet','pink']
+
+  constructor(
+    private _httpClient: HttpClient
+  ) { }
+  
+  addColor() {
+    this.buttons.push({ number: this.buttons.length + 1, color: this.colorClasses[this.buttons.length] })
+    console.log(this.buttons);
+  }
 
   onClickFileInputButton(): void {
     this.fileInput.nativeElement.click();
@@ -56,10 +92,12 @@ export class AppComponent {
     let tempValues = text.split('\n');
     let id = 1;
     tempValues.forEach(value => {
+      this.resultJSON.push(0);
       this.values.push({ id, value });
       id = id + 1;
     });
     setTimeout(() => {
+      console.log(this.resultJSON);
       document.getElementById('1').classList.add('selected-row');
     }, 200);
   }
@@ -93,20 +131,35 @@ export class AppComponent {
       id = event.toElement.id;
     }
     let colorClass = '';
-    let colorClasses = ['mat-red', 'mat-yellow', 'mat-green', 'mat-blue'];
-    if (this.activeColor === 0) colorClass = colorClasses[0];
-    if (this.activeColor === 1) colorClass = colorClasses[1];
-    if (this.activeColor === 2) colorClass = colorClasses[2];
-    if (this.activeColor === 3) colorClass = colorClasses[3];
+    for (let i = 0; i < this.buttons.length; i++) {
+      if (this.activeColor === i) colorClass = `mat-${this.colorClasses[i]}`;
+    }
 
     if (document.getElementById(id).classList.contains(colorClass)) {
+      this.resultJSON[id - 1] = 0;
       document.getElementById(id).classList.remove(colorClass);
     } else {
-      colorClasses.forEach(color => {
-        document.getElementById(id).classList.remove(color);
+      this.colorClasses.forEach(color => {
+        document.getElementById(id).classList.remove(`mat-${color}`);
       });
+      this.resultJSON[id - 1] = this.activeColor + 1;
       document.getElementById(id).classList.add(colorClass);
     }
+  }
+
+  getResult() {
+    const filename = `file-${new Date().toLocaleTimeString()}.json`;
+    let arrayToString = JSON.stringify(Object.assign({}, this.resultJSON));  // convert array to string
+    console.log(arrayToString);
+    arrayToString.replace('/"/g', '');
+    const blob = new Blob([arrayToString], { type: '.json' });
+    saveAs(blob, filename);
+  }
+
+  download(url: string): Observable<Blob> {
+    return this._httpClient.get(url, {
+      responseType: 'blob'
+    })
   }
 
 }

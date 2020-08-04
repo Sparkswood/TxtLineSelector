@@ -1,16 +1,16 @@
 
 <div class="menu">
   <div class="container">
-    <input type="file" style="display: none" #fileInput accept="image/*" (change)="onChangeFileInput($event)" />
+    <input #fileInput type="file" style="display: none" accept=".txt" (change)="onChangeFileInput($event)" />
+    <a #fileDownload [href]="fileUrl" style="display: none" download="file.txt"></a>
     <button mat-raised-button color="primary" (click)="onClickFileInputButton()">
       Load file
     </button>
   </div>
   
-    <button mat-raised-button color="red" (click)="setActiveColor('1')">1</button>
-    <button mat-raised-button color="yellow" (click)="setActiveColor('2')">2</button>
-    <button mat-raised-button color="green" (click)="setActiveColor('3')">3</button>
-    <button mat-raised-button color="blue" (click)="setActiveColor('4')">4</button>
+    <button mat-raised-button *ngFor="let button of buttons" [color]="button.color" (click)="setActiveColor(button.number)">{{button.number}}</button>
+    <button mat-raised-button *ngIf="buttons.length < 9" (click)="addColor()">+</button>
+    <button mat-raised-button color="primary" (click)="getResult()">Result</button>
 </div>
 
 <div id="file" class="file">

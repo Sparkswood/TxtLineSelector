@@ -23,8 +23,27 @@
     background: white;
 }
 
-.mat-green {
-    background-color: rgb(96, 166, 66) !important;
+.selected-row {
+    border: 2px solid black;
+}
+
+button {
+    width: 80px;
+    margin: 5px 10px;
+}
+
+.mat-grey {
+    background-color: rgb(156, 142, 140) !important;
+    color: #fff;
+}
+
+.mat-red {
+    background-color: rgb(186, 66, 61) !important;
+    color: #fff;
+}
+
+.mat-orange {
+    background-color: rgb(222, 142, 51) !important;
     color: #fff;
 }
 
@@ -33,21 +52,27 @@
     color: #fff;
 }
 
+.mat-green {
+    background-color: rgb(96, 166, 66) !important;
+    color: #fff;
+}
+
 .mat-blue {
     background-color: rgb(90, 148, 166) !important;
     color: #fff;
 }
 
-.mat-red {
-    background-color: rgb(168, 62, 73) !important;
+.mat-granat {
+    background-color: rgb(61, 53, 212) !important;
     color: #fff;
 }
 
-.selected-row {
-    border: 2px solid black;
+.mat-violet {
+    background-color: rgb(143, 90, 166) !important;
+    color: #fff;
 }
 
-button {
-    width: 80px;
-    margin: 5px 10px;
+.mat-pink {
+    background-color: rgb(201, 103, 183) !important;
+    color: #fff;
 }

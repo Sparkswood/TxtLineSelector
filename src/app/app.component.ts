@@ -21,16 +21,26 @@ export class AppComponent {
       }
     }
 
-    if ((event.key === 'ArrowUp' || event.key === 'w') && this.activeRow - 1 > 0) {
+    if ((event.key === 'ArrowUp' || event.key === 'w' || event.key === 'W') && this.activeRow - 1 > 0) {
+      if (event.shiftKey) {
+        this.markValue(null, true);
+      }
       this.onUp();
     }
 
-    if ((event.key === 'ArrowDown' || event.key === 's') && this.activeRow + 1 <= this.values.length) {
+    if ((event.key === 'ArrowDown' || event.key === 's' || event.key === 'S') && this.activeRow + 1 <= this.values.length) {
+      console.log(event.shiftKey);
+      if (event.shiftKey) {
+        this.markValue(null, true);
+      }
       this.onDown();
     }
     if (event.key === 'Enter') {
       event.preventDefault();
       this.markValue(null, true);
+    }
+    if ((event.key === '+' || event.key === '=') && this.buttons.length < 9) {
+      this.addColor();
     }
   }
 
@@ -41,8 +51,6 @@ export class AppComponent {
   activeColor: number = 0;
 
   resultJSON = [];
-  fileUrl;
-  fileNameToDownload = 'file.txt';
 
   buttons = [
     {
@@ -59,7 +67,7 @@ export class AppComponent {
     },
     
   ]
-  colorClasses = ['grey', 'red', 'orange','yellow', 'green','blue', 'granat', 'violet','pink']
+  colorClasses = ['grey', 'red', 'orange', 'yellow', 'green', 'blue', 'granat', 'violet', 'pink'];
 
   constructor(
     private _httpClient: HttpClient
@@ -160,6 +168,10 @@ export class AppComponent {
     return this._httpClient.get(url, {
       responseType: 'blob'
     })
+  }
+
+  onDrag(event) {
+    console.log(event);
   }
 
 }

@@ -2,7 +2,6 @@
 <div class="menu">
   <div class="container">
     <input #fileInput type="file" style="display: none" accept=".txt" (change)="onChangeFileInput($event)" />
-    <a #fileDownload [href]="fileUrl" style="display: none" download="file.txt"></a>
     <button mat-raised-button color="primary" (click)="onClickFileInputButton()">
       Load file
     </button>

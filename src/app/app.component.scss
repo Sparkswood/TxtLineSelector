@@ -1,3 +1,6 @@
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+@import '~@angular/material/theming';
+
 .values {
     user-select: none;
     white-space: pre;
@@ -25,7 +28,7 @@
 }
 
 .selected-row {
-    border: 2px solid black;
+    border: 2px solid #3F51B5;
 }
 
 button {

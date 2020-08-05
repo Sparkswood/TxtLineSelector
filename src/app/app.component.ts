@@ -43,11 +43,13 @@ export class AppComponent {
     }
   }
 
+  activeFile: number = 0;
+  filesTable: File[] = [];
   file: File | null = null;
   values = [];
 
   activeRow = 1;
-  activeColor: number = 0;
+  activeColor: number = 1;
 
   mouseHold: boolean = false;
 
@@ -89,15 +91,27 @@ export class AppComponent {
   onChangeFileInput(event): void {
     try {
       this.values = [];
-      this.file = event.target.files[0];
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const text = reader.result.toString().trim();
-        this.splitText(text);
-      }
-      reader.readAsText(this.file);
+      this.activeFile = 0;
+      this.filesTable = event.target.files;
+      this.loadFile();
     } catch{}
 
+  }
+
+  loadFile() {
+    this.resultJSON = [];
+    this.values = [];
+    const reader = new FileReader;
+    this.file = this.filesTable[this.activeFile];
+    reader.onload = (e) => {
+      const text = reader.result.toString();
+      console.log(text);
+      this.splitText(text);
+    }
+    reader.readAsText(this.file);
+    if (this.activeFile < this.filesTable.length) {
+      this.activeFile = this.activeFile + 1;
+    }
   }
 
   splitText(text: string) {
@@ -146,20 +160,15 @@ export class AppComponent {
       if (this.activeColor === i) colorClass = `mat-${this.colorClasses[i]}`;
     }
 
-    // if (document.getElementById(id).classList.contains(colorClass)) {
-    //   this.resultJSON[id - 1] = 0;
-    //   document.getElementById(id).classList.remove(colorClass);
-    // } else {
-      this.colorClasses.forEach(color => {
-        document.getElementById(id).classList.remove(`mat-${color}`);
-      });
-      this.resultJSON[id - 1] = this.activeColor + 1;
-      document.getElementById(id).classList.add(colorClass);
-    // }
+    this.colorClasses.forEach(color => {
+      document.getElementById(id).classList.remove(`mat-${color}`);
+    });
+    this.resultJSON[id - 1] = this.activeColor;
+    document.getElementById(id).classList.add(colorClass);
   }
 
   getResult() {
-    const filename = `file-${new Date().toLocaleTimeString()}.json`;
+    const filename = `${this.filesTable[this.activeFile - 1].name.replace('.txt','')}-${new Date().toLocaleTimeString()}.json`;
     let arrayToString = JSON.stringify(Object.assign({}, this.resultJSON));  // convert array to string
     const blob = new Blob([arrayToString], { type: '.json' });
     saveAs(blob, filename);
@@ -171,6 +180,7 @@ export class AppComponent {
     })
   }
 
+  //#region mouse multichecking
   startMouseHold(id) {
     document.getElementById(this.activeRow.toString()).classList.remove('selected-row');
     this.mouseHold = true;
@@ -193,5 +203,6 @@ export class AppComponent {
       document.getElementById(this.activeRow.toString()).classList.add('selected-row');
     }
   }
+  //#endregion
 
 }

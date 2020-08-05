@@ -15,14 +15,16 @@
     <button mat-raised-button *ngIf="isThereMoreColors()" (click)="addColor()">
       <span class="material-icons">add</span>
     </button>
-    <button mat-raised-button color="primary" (click)="getResult()">
+    <button mat-raised-button *ngIf="isAnyFileLoaded()" color="primary" (click)="downloadResult()">
       <span class="material-icons">print</span>
     </button>
 </div>
 
 <div id="file" class="file">
   <div class="values default-value-color" *ngFor="let value of values" id="{{value.id}}" (mousedown)="startMouseHold(value.id)" (mouseleave)="onDragMouse(value.id)" (mouseup)="endMouseHold(value.id)">
-    {{value.value}}
+      <pre>
+        {{value.value}}
+      </pre>
   </div>
 </div>
 

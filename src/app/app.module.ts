@@ -6,10 +6,13 @@ import { AppComponent } from './app.component';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialogModule } from '@angular/material/dialog';
+import { DialogConfirmationComponent } from './dialog/dialog-confirmation/dialog-confirmation.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    DialogConfirmationComponent
   ],
   imports: [
     BrowserModule,
@@ -17,6 +20,7 @@ import { MatButtonModule } from '@angular/material/button';
     NoopAnimationsModule,
     MatChipsModule,
     MatButtonModule,
+    MatDialogModule
   ],
   providers: [],
   bootstrap: [AppComponent]

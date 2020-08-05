@@ -17,7 +17,12 @@ input {
 
 .file {
     width: min-content;
-    margin-left: 100px;
+    margin: 0 0 0 100px;
+}
+
+pre {
+    height: 22px;
+    font-size: x-small;
 }
 
 .menu {
@@ -27,6 +32,11 @@ input {
     display: inline-grid;
     top: 0;
     background: white;
+}
+
+pre {
+    margin: 0;
+    padding: 0;
 }
 
 .selected-row {

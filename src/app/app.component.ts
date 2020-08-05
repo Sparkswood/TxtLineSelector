@@ -11,7 +11,6 @@ export class AppComponent {
   @ViewChild('fileDownload') fileDownload;
 
   @HostListener('window:keydown', ['$event']) onkeypress(event: KeyboardEvent) {
-    console.log(event.key);
     if (event.key === '1' || event.key === '2' || event.key === '3' || event.key === '4' ||  event.key === '5' || event.key === '6' || event.key === '7' || event.key === '8' || event.key === '9' || event.key === '0') {
       if (parseInt(event.key) < this.buttons.length) {
         this.setActiveColor(event.key);
@@ -43,6 +42,10 @@ export class AppComponent {
     else if ((event.key === '>' || event.key === '.') && this.isThereNextFile()) {
       console.log(this.filesTable.length);
       this.loadFile();
+    }
+    else if (event.key === ' ') {
+      event.preventDefault();
+      this.getResult();
     }
   }
 

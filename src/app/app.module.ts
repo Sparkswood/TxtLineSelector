@@ -6,7 +6,6 @@ import { AppComponent } from './app.component';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatButtonModule } from '@angular/material/button';
-import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -18,7 +17,6 @@ import { HttpClientModule } from '@angular/common/http';
     NoopAnimationsModule,
     MatChipsModule,
     MatButtonModule,
-    HttpClientModule
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -1,18 +1,18 @@
 
 <div class="menu">
   <div class="container">
-    <input #fileInput type="file" multiple="true" style="display: none" accept=".txt" (change)="onChangeFileInput($event)" />
+    <input #fileInput type="file" multiple="true" accept=".txt" (change)="onChangeFileInput($event)" />
     <button mat-raised-button color="primary" (click)="onClickFileInputButton()">
       <span class="material-icons">description</span>
     </button>
-    <button mat-raised-button color="primary" *ngIf="filesTable.length !== 0 && activeFile !== filesTable.length" (click)="loadFile()">
+    <button mat-raised-button color="primary" *ngIf="isThereNextFile()" (click)="loadFile()">
       <span class="material-icons">redo</span>
       {{activeFile + 1}}
     </button>
   </div>
   
     <button mat-raised-button *ngFor="let button of buttons" [color]="button.color" (click)="setActiveColor(button.number)">{{button.number}}</button>
-    <button mat-raised-button *ngIf="buttons.length < 10" (click)="addColor()">
+    <button mat-raised-button *ngIf="isThereMoreColors()" (click)="addColor()">
       <span class="material-icons">add</span>
     </button>
     <button mat-raised-button color="primary" (click)="getResult()">

@@ -1,6 +1,4 @@
 import { HostListener, Component, ViewChild } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
 import { saveAs } from 'file-saver';
 
 @Component({
@@ -13,13 +11,14 @@ export class AppComponent {
   @ViewChild('fileDownload') fileDownload;
 
   @HostListener('window:keydown', ['$event']) onkeypress(event: KeyboardEvent) {
+    console.log(event.key);
     if (event.key === '1' || event.key === '2' || event.key === '3' || event.key === '4' ||  event.key === '5' || event.key === '6' || event.key === '7' || event.key === '8' || event.key === '9' || event.key === '0') {
       if (parseInt(event.key) < this.buttons.length) {
         this.setActiveColor(event.key);
       }
     }
 
-    if ((event.key === 'ArrowUp' || event.key === 'w' || event.key === 'W') && this.activeRow - 1 > 0) {
+     else if ((event.key === 'ArrowUp' || event.key === 'w' || event.key === 'W') && this.activeRow - 1 > 0) {
       event.preventDefault();
       if (event.shiftKey) {
         this.markValue(null, true);
@@ -27,19 +26,23 @@ export class AppComponent {
       this.onUp();
     }
 
-    if ((event.key === 'ArrowDown' || event.key === 's' || event.key === 'S') && this.activeRow + 1 <= this.values.length) {
+    else if ((event.key === 'ArrowDown' || event.key === 's' || event.key === 'S') && this.activeRow + 1 <= this.values.length) {
       event.preventDefault();
       if (event.shiftKey) {
         this.markValue(null, true);
       }
       this.onDown();
     }
-    if (event.key === 'Enter') {
+    else if (event.key === 'Enter') {
       event.preventDefault();
       this.markValue(null, true);
     }
-    if ((event.key === '+' || event.key === '=') && this.buttons.length < 10) {
+    else if ((event.key === '+' || event.key === '=') && this.buttons.length < 10) {
       this.addColor();
+    }
+    else if ((event.key === '>' || event.key === '.') && this.isThereNextFile()) {
+      console.log(this.filesTable.length);
+      this.loadFile();
     }
   }
 
@@ -77,9 +80,7 @@ export class AppComponent {
   ]
   colorClasses: string[] = ['', 'grey', 'red', 'orange', 'yellow', 'green', 'blue', 'granat', 'violet', 'pink'];
 
-  constructor(
-    private _httpClient: HttpClient
-  ) { }
+  constructor() { }
 
   //#region file select
   onClickFileInputButton(): void {
@@ -87,21 +88,21 @@ export class AppComponent {
   }
 
   onChangeFileInput(event): void {
-    try {
-      this.values = [];
-      this.activeFile = 0;
-      this.filesTable = event.target.files;
-      this.loadFile();
-    } catch{}
-
+    this.activeFile = 0;
+    this.filesTable = event.target.files;
+    this.loadFile();
   }
 
   loadFile() {
-    this.resultJSON = [];
     this.values = [];
+    this.resultJSON = [];
+    this.fileReader();
+  }
+
+  private fileReader() {
     const reader = new FileReader;
     this.file = this.filesTable[this.activeFile];
-    reader.onload = (e) => {
+    reader.onload = () => {
       const text = reader.result.toString();
       this.splitText(text);
     }
@@ -113,7 +114,7 @@ export class AppComponent {
 
   //#endregion
 
-  splitText(text: string) {
+  private splitText(text: string) {
     let tempValues = text.split('\n');
     let id = 1;
     tempValues.forEach(value => {
@@ -126,29 +127,21 @@ export class AppComponent {
     }, 200);
   }
 
-  addColor() {
-    this.buttons.push({ number: this.buttons.length, color: this.colorClasses[this.buttons.length] })
-  }
-
-  setActiveColor(colorNumber) {
-    this.activeColor = parseInt(colorNumber);
-  }
-
-  onUp() {
+  private onUp() {
     document.getElementById(this.activeRow.toString()).classList.remove('selected-row');
     this.activeRow = this.activeRow - 1;
     document.getElementById(this.activeRow.toString()).classList.add('selected-row');
     window.scrollTo(0, document.getElementById(this.activeRow.toString()).offsetTop - window.innerHeight / 2);
   }
 
-  onDown() {
+  private onDown() {
     document.getElementById(this.activeRow.toString()).classList.remove('selected-row');
     this.activeRow = this.activeRow + 1;
     document.getElementById(this.activeRow.toString()).classList.add('selected-row');
     window.scrollTo(0, document.getElementById(this.activeRow.toString()).offsetTop - window.innerHeight / 2);
   }
 
-  markValue(event, isEnterEvent) {
+  private markValue(event, isEnterEvent) {
     let id;
     if (isEnterEvent) {
       id = this.activeRow;
@@ -170,17 +163,29 @@ export class AppComponent {
     document.getElementById(id).classList.add(colorClass);
   }
 
+  //#region GUI
+
+  addColor() {
+    this.buttons.push({ number: this.buttons.length, color: this.colorClasses[this.buttons.length] })
+  }
+
+  setActiveColor(colorNumber) {
+    this.activeColor = parseInt(colorNumber);
+  }
+
+  isThereNextFile() {
+    return this.filesTable.length !== 0 && this.activeFile !== this.filesTable.length;
+  }
+
+  isThereMoreColors() {
+    return this.buttons.length < 10;
+  }
+
   getResult() {
     const filename = `${this.filesTable[this.activeFile - 1].name.replace('.txt','')}-${new Date().toLocaleTimeString()}.json`;
     let arrayToString = JSON.stringify(Object.assign({}, this.resultJSON));  // convert array to string
     const blob = new Blob([arrayToString], { type: '.json' });
     saveAs(blob, filename);
-  }
-
-  download(url: string): Observable<Blob> {
-    return this._httpClient.get(url, {
-      responseType: 'blob'
-    })
   }
 
   //#region mouse multichecking
@@ -221,6 +226,8 @@ export class AppComponent {
       }
     }
   }
+  //#endregion
+
   //#endregion
 
 }

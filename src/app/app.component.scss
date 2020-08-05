@@ -16,12 +16,14 @@
 }
 
 .file {
+    width: min-content;
     margin-left: 100px;
 }
 
 .menu {
     width: 100px;
     position: fixed;
+    border-radius: 0 0 5px 0;
     display: inline-grid;
     top: 0;
     background: white;

@@ -48,12 +48,13 @@ export class AppComponent {
   file: File | null = null;
   values = [];
 
-  activeRow = 1;
+  activeRow: number  = 1;
   activeColor: number = 1;
 
   mouseHold: boolean = false;
+  lastCheckedId: number = 1;
 
-  resultJSON = [];
+  resultJSON: number[] = [];
 
   buttons = [
     {
@@ -74,16 +75,13 @@ export class AppComponent {
     },
     
   ]
-  colorClasses = ['', 'grey', 'red', 'orange', 'yellow', 'green', 'blue', 'granat', 'violet', 'pink'];
+  colorClasses: string[] = ['', 'grey', 'red', 'orange', 'yellow', 'green', 'blue', 'granat', 'violet', 'pink'];
 
   constructor(
     private _httpClient: HttpClient
   ) { }
-  
-  addColor() {
-    this.buttons.push({ number: this.buttons.length, color: this.colorClasses[this.buttons.length] })
-  }
 
+  //#region file select
   onClickFileInputButton(): void {
     this.fileInput.nativeElement.click();
   }
@@ -105,7 +103,6 @@ export class AppComponent {
     this.file = this.filesTable[this.activeFile];
     reader.onload = (e) => {
       const text = reader.result.toString();
-      console.log(text);
       this.splitText(text);
     }
     reader.readAsText(this.file);
@@ -113,6 +110,8 @@ export class AppComponent {
       this.activeFile = this.activeFile + 1;
     }
   }
+
+  //#endregion
 
   splitText(text: string) {
     let tempValues = text.split('\n');
@@ -125,6 +124,10 @@ export class AppComponent {
     setTimeout(() => {
       document.getElementById('1').classList.add('selected-row');
     }, 200);
+  }
+
+  addColor() {
+    this.buttons.push({ number: this.buttons.length, color: this.colorClasses[this.buttons.length] })
   }
 
   setActiveColor(colorNumber) {
@@ -185,6 +188,7 @@ export class AppComponent {
     document.getElementById(this.activeRow.toString()).classList.remove('selected-row');
     this.mouseHold = true;
     this.activeRow = id;
+    this.lastCheckedId = id;
     document.getElementById(this.activeRow.toString()).classList.add('selected-row');
   }
 
@@ -192,15 +196,29 @@ export class AppComponent {
     document.getElementById(this.activeRow.toString()).classList.remove('selected-row');
     this.onDragMouse(id);
     this.mouseHold = false;
+    this.lastCheckedId = id;
     document.getElementById(this.activeRow.toString()).classList.add('selected-row');
   }
 
   onDragMouse(id) {
     if (this.mouseHold) {
-      document.getElementById(this.activeRow.toString()).classList.remove('selected-row');
-      this.activeRow = id;
-      this.markValue(null, true);
-      document.getElementById(this.activeRow.toString()).classList.add('selected-row');
+      if (this.lastCheckedId > id) {
+        for (let i = this.lastCheckedId; i >= id; i--) {
+          document.getElementById(this.activeRow.toString()).classList.remove('selected-row');
+          this.activeRow = i;
+          this.markValue(null, true);
+          document.getElementById(this.activeRow.toString()).classList.add('selected-row');
+        }
+        this.lastCheckedId = id;
+      } else {
+        for (let i = this.lastCheckedId; i <= id; i++) {
+          document.getElementById(this.activeRow.toString()).classList.remove('selected-row');
+          this.activeRow = i;
+          this.markValue(null, true);
+          document.getElementById(this.activeRow.toString()).classList.add('selected-row');
+        }
+        this.lastCheckedId = id;
+      }
     }
   }
   //#endregion

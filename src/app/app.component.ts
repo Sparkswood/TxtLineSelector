@@ -3,17 +3,19 @@ import { MatDialog } from '@angular/material/dialog';
 import { saveAs } from 'file-saver';
 import { Observable } from 'rxjs';
 import { DialogConfirmationComponent } from './dialog/dialog-confirmation/dialog-confirmation.component';
+import { DialogSizeWarningComponent } from './dialog/dialog-size-warning/dialog-size-warning.component';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
   @ViewChild('fileInput') fileInput;
   @ViewChild('fileDownload') fileDownload;
 
   @HostListener('window:keydown', ['$event']) onkeypress(event: KeyboardEvent) {
+    console.log(event.key);
     if ((event.key === '1' || event.key === '2' || event.key === '3' || event.key === '4' ||  event.key === '5' || event.key === '6' || event.key === '7' || event.key === '8' || event.key === '9' || event.key === '0') && this.areUSure) {
       if (parseInt(event.key) < this.buttons.length) {
         this.setActiveColor(event.key);
@@ -132,31 +134,35 @@ export class AppComponent {
     return dialogRef.afterClosed();
   }
 
+  private openSizeWarningDialog(): Observable<boolean> {
+    const dialogRef = this.matDialog.open(DialogSizeWarningComponent, {});
+    return dialogRef.afterClosed();
+  }
+
   private splitText(text: string) {
-    let tempValues = text.split('\n');
+    const tempValues = text.split('\n');
     let id = 1;
     tempValues.forEach(value => {
+      const className = '';
       this.resultJSON.push(0);
-      this.values.push({ id, value });
+      this.values.push({ id, value, className });
       id = id + 1;
     });
-    setTimeout(() => {
-      document.getElementById('1').classList.add('selected-row');
-    }, 200);
+    if (this.values.length > 2796200) {
+      this.openSizeWarningDialog();
+    }
+    this.values = [...this.values];
+    this.activeRow = 1;
   }
 
   private onUp() {
-    document.getElementById(this.activeRow.toString()).classList.remove('selected-row');
     this.activeRow = this.activeRow - 1;
-    document.getElementById(this.activeRow.toString()).classList.add('selected-row');
-    window.scrollTo(0, document.getElementById(this.activeRow.toString()).offsetTop - window.innerHeight / 2);
+    document.getElementById('file').scrollTo(0, this.activeRow * 12 - window.innerHeight / 2); // 12 is row height
   }
 
   private onDown() {
-    document.getElementById(this.activeRow.toString()).classList.remove('selected-row');
     this.activeRow = this.activeRow + 1;
-    document.getElementById(this.activeRow.toString()).classList.add('selected-row');
-    window.scrollTo(0, document.getElementById(this.activeRow.toString()).offsetTop - window.innerHeight / 2);
+    document.getElementById('file').scrollTo(0, this.activeRow * 12 - window.innerHeight / 2);
   }
 
   private markValue(event, isEnterEvent) {
@@ -164,21 +170,15 @@ export class AppComponent {
     if (isEnterEvent) {
       id = this.activeRow;
     } else {
-      document.getElementById(this.activeRow.toString()).classList.remove('selected-row');
       this.activeRow = parseInt(event.toElement.id);
-      document.getElementById(this.activeRow.toString()).classList.add('selected-row');
       id = event.toElement.id;
     }
     let colorClass = '';
     for (let i = 0; i < this.buttons.length; i++) {
-      if (this.activeColor === i) colorClass = `mat-${this.colorClasses[i]}`;
+      if (this.activeColor !== 0 && this.activeColor === i) colorClass = `mat-${this.colorClasses[i]}`;
     }
-
-    this.colorClasses.forEach(color => {
-      document.getElementById(id).classList.remove(`mat-${color}`);
-    });
     this.resultJSON[id - 1] = this.activeColor;
-    document.getElementById(id).classList.add(colorClass);
+    this.values[id - 1].className = colorClass;
   }
 
   //#region GUI
@@ -204,48 +204,39 @@ export class AppComponent {
   }
 
   downloadResult() {
-    const filename = `${this.filesTable[this.activeFile - 1].name.replace('.txt','')}-${new Date().toLocaleTimeString()}.json`;
+    const filename = `${this.filesTable[this.activeFile - 1].name.replace('.txt','')}-${new Date().toLocaleTimeString()}.txt`;
     let arrayToString = JSON.stringify(Object.assign({}, this.resultJSON));  // convert array to string
-    const blob = new Blob([arrayToString], { type: '.json' });
+    const blob = new Blob([arrayToString], { type: 'text/plain' });
     saveAs(blob, filename);
   }
 
   //#region mouse multichecking
   startMouseHold(id) {
-    document.getElementById(this.activeRow.toString()).classList.remove('selected-row');
-    this.mouseHold = true;
     this.activeRow = id;
+    this.mouseHold = true;
     this.lastCheckedId = id;
-    document.getElementById(this.activeRow.toString()).classList.add('selected-row');
   }
 
   endMouseHold(id) {
-    document.getElementById(this.activeRow.toString()).classList.remove('selected-row');
     this.onDragMouse(id);
     this.mouseHold = false;
     this.lastCheckedId = id;
-    document.getElementById(this.activeRow.toString()).classList.add('selected-row');
   }
 
   onDragMouse(id) {
-    if (this.mouseHold) {
-      if (this.lastCheckedId > id) {
-        for (let i = this.lastCheckedId; i >= id; i--) {
-          document.getElementById(this.activeRow.toString()).classList.remove('selected-row');
-          this.activeRow = i;
-          this.markValue(null, true);
-          document.getElementById(this.activeRow.toString()).classList.add('selected-row');
-        }
-        this.lastCheckedId = id;
-      } else {
-        for (let i = this.lastCheckedId; i <= id; i++) {
-          document.getElementById(this.activeRow.toString()).classList.remove('selected-row');
-          this.activeRow = i;
-          this.markValue(null, true);
-          document.getElementById(this.activeRow.toString()).classList.add('selected-row');
-        }
-        this.lastCheckedId = id;
+    if (!this.mouseHold) return;
+    if (this.lastCheckedId > id) {
+      for (let i = this.lastCheckedId; i >= id; i--) {
+        this.activeRow = i;
+        this.markValue(null, true);
       }
+      this.lastCheckedId = id;
+    } else {
+      for (let i = this.lastCheckedId; i <= id; i++) {
+        this.activeRow = i;
+        this.markValue(null, true);
+      }
+      this.lastCheckedId = id;
     }
   }
   //#endregion

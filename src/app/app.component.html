@@ -1,4 +1,3 @@
-
 <div class="menu">
   <div class="container">
     <input #fileInput type="file" multiple="true" accept=".txt" (change)="onChangeFileInput($event)" />
@@ -20,12 +19,18 @@
     </button>
 </div>
 
-<div id="file" class="file">
-  <div class="values default-value-color" *ngFor="let value of values" id="{{value.id}}" (mousedown)="startMouseHold(value.id)" (mouseleave)="onDragMouse(value.id)" (mouseup)="endMouseHold(value.id)">
-      <pre>
-        {{value.value}}
-      </pre>
-  </div>
-</div>
+<cdk-virtual-scroll-viewport id="file" class="file" [itemSize]="12" [minBufferPx]="100" [maxBufferPx]="250"  autosize>
+  <ng-container *cdkVirtualFor="let value of values">
+    <pre id="{{value.id}}" 
+        (mousedown)="startMouseHold(value.id)"
+        (mouseleave)="onDragMouse(value.id)"
+        (mouseup)="endMouseHold(value.id)"
+        class="default-value-color {{value.className}}" 
+        [ngStyle]="{'border': activeRow === value.id ? '2px solid #3F51B5' : ''}"
+        >
+      {{value.value}}
+    </pre>
+  </ng-container>
+</cdk-virtual-scroll-viewport>
 
 <router-outlet></router-outlet>
